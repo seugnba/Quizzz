@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A quiz on the life of Shaykh Ahmad Bamba</title>
+    <style>
+      #red {
+        background-color: red;
+      }
+      #green {
+        background-color: green;
+      }
+
+      body {
+        background-image: url(img/IMG_7390.JPG);
+        /*background-image: url(https://www.africarivista.it/wp-content/uploads/2020/11/APERTURAS-FILEminimizer.jpg);*/
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "header"
+          "main"
+          "footer";
+        height: 100vh;
+        width: 100vw;
+        position: relative;
+      }
+      header {
+        grid-area: header;
+
+        padding: 10px;
+        width: 100%;
+        text-align: center;
+
+        background-color: white;
+
+        color: black;
+        margin-top: 25px;
+      }
+      header h1 {
+        text-decoration: underline;
+      }
+      main {
+        grid-area: main;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 3;
+        grid-template-rows: 6;
+        grid-template-areas:
+          "question"
+          "text"
+          "btn";
+        justify-content: center;
+      }
+
+      footer {
+        grid-area: footer;
+
+        background-color: white;
+
+        color: black;
+        width: 100%;
+        text-align: center;
+        padding: 5px;
+      }
+      #reponses {
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+        padding: 10px;
+        justify-content: center;
+        text-align: center;
+      }
+      #timer {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        justify-content: center;
+        text-align: center;
+        border: 2px solid white;
+        background-color: black;
+        color: white;
+        border-radius: 50px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: medium;
+        margin-left: 50px;
+        margin-right: 50px;
+        padding: 35px 35px;
+        font-size: large;
+        max-height: 30px;
+        max-width: 225px;
+      }
+      #points {
+        border: 1px groove white;
+        background-color: black;
+        color: white;
+        margin-bottom: 0px;
+        text-align: center;
+        justify-content: center;
+        margin-top: 30px;
+        max-height: 30px;
+        max-width: 225px;
+        padding: 10px;
+        display: none;
+      }
+      .divReponses {
+        background-color: black;
+        color: white;
+        border: 0.5px transparent white;
+        border-radius: 20px;
+        cursor: pointer;
+        padding: 30px 30px;
+      }
+      .btn {
+        background-color: black;
+        color: white;
+        text-align: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      #question {
+        /* background-color: black;*/
+        background-color: white;
+        color: white;
+        padding: 20px 20px;
+        justify-content: center;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: large;
+      }
+      .hide {
+        display: none;
+      }
+      #nb {
+        color: black;
+        padding: 20px 20px;
+      }
+      #Commencer {
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Quiz sur la Sainte Vie de Shaykh Ahmad Bamba</h1>
+      <span id="nb">
+        <strong>NB: </strong>Tu as droit à une seule réponse à chaque question
+        posée. Chaque bonne réponse(verte) vaut 10 points et chaque
+        mauvaise(rouge) 0. Fini le quizz le nombre total de points que tu as
+        obtenus te sera montré. Bonne chance et attention au timer!!!😊
+      </span>
+      <div id="question" class="hide"></div>
+    </header>
+    <main class="container">
+      <div id="reponses"></div>
+
+      <span id="timer"></span>
+      <button id="Commencer" class="btn">Commencer</button>
+      <div>
+        <button id="Continuer" class="hide btn">Continuer</button>
+        <span id="points" ></span>
+      </div>
+    </main>
+
+    <footer>
+      <p>copyrigth Aout 2024 by l'aspirant Mouride M❤️M</p>
+    </footer>
+
+    <script >
+      
+const question = document.querySelector("#question");
+const reponses = document.getElementById("reponses");
+const points = document.getElementById("points");
+const timer = document.getElementById("timer");
+const btnCommencer = document.getElementById("Commencer");
+const btnContinuer = document.getElementById("Continuer");
+const nb = document.querySelector("#nb");
+timer.classList.add("hide");
+points.classList.add("hide");
+let intervalId; // Per tenere traccia dell'intervallo del timer
+let ar = [
+  {
+    domanda: "Quand est-ce que est né le Shaykh?",
+    reponse1: { reponse: 1853, valid: true },
+    reponse2: { reponse: 1895, valid: false },
+    reponse3: { reponse: 1900, valid: false },
+  },
+  {
+    domanda: "Quelle école théologique suivait le Shaykh?",
+    reponse1: { reponse: "Atharite", valid: false },
+    reponse2: { reponse: "Maturidite", valid: false },
+    reponse3: { reponse: "Asharite", valid: true },
+  },
+  {
+    domanda:
+      "Avec quelles armes avait dit le Shaykh  qu'il combattait les colons?",
+    reponse1: { reponse: "Les fusils", valid: false },
+    reponse2: { reponse: "Le savoir et la piété", valid: true },
+    reponse3: { reponse: "La poésie", valid: false },
+  },
+  {
+    domanda: "Quand est-ce que le Shaykh fonda Touba?",
+    reponse1: { reponse: 1902, valid: false },
+    reponse2: { reponse: 1855, valid: false },
+    reponse3: { reponse: 1888, valid: true },
+  },
+  {
+    domanda:
+      "Comment s'appelle l'oeuvre plus importante que le Shaykh a écrit sur le Tawhid?",
+    reponse1: { reponse: "Makhaalikhoune Niraan", valid: false },
+    reponse2: { reponse: "Tazawwudus Sikhaar", valid: false },
+    reponse3: { reponse: "Mawaahiboul Quddus", valid: true },
+  },
+  {
+    domanda: "Quel est le premier village fondé par le Shaykh?",
+    reponse1: { reponse: "Daaru Salaam", valid: true },
+    reponse2: { reponse: "Daaru Quddos", valid: false },
+    reponse3: { reponse: "Daaru Rahmaan", valid: false },
+  },
+  {
+    domanda:
+      "Quel était le motif principal pour lequel les colons avaient déporté le Shaykh au Gabon?",
+    reponse1: {
+      reponse: "Ils voulaient qu'il s'allie avec eux",
+      valid: false,
+    },
+    reponse2: {
+      reponse:
+        "Ils pensaient qu'il allait leur déclarer une guerre sainte",
+      valid: true,
+    },
+    reponse3: {
+      reponse: "Le Shaykh voulait quitter son pays natal",
+      valid: false,
+    },
+  },
+  {
+    domanda:
+      "Où Allah a-t-Il découragé iblis des affaires du Shaykh, écrit par le Shaykh dans un de ses Khassida?",
+    reponse1: { reponse: "Mbacké Kadior", valid: false },
+    reponse2: {
+      reponse: "Touba",
+      valid: false,
+    },
+    reponse3: {
+      reponse: "Djèwol",
+      valid: true,
+    },
+  },
+
+  {
+    domanda: "Quelle école juridique suivait le Shaykh?",
+    reponse1: { reponse: "Hanbalite", valid: false },
+    reponse2: { reponse: "Malikite", valid: true },
+    reponse3: { reponse: "Shafiite", valid: false },
+  },
+  {
+    domanda:
+      "Dans quelle ville le Shaykh a subit des épreuves qu'il ne divulguera jamais par pudeur dit-il?",
+    reponse1: { reponse: "Saint-Louis", valid: true },
+    reponse2: { reponse: "Dakar", valid: false },
+    reponse3: { reponse: "Libreville", valid: false },
+  },
+  {
+    domanda:
+      "Dans quel Khassida le Shaykh a cité explicitement les noms des gens de la Caverne?",
+    reponse1: { reponse: "Takhmiis", valid: false },
+    reponse2: { reponse: "Matlaboul Shifai", valid: false },
+    reponse3: { reponse: "Wasilatoul Rubooh", valid: true },
+  },
+  {
+    domanda: "Quel Imam a influencé le plus le Shaykh sur le Soufisme ",
+    reponse1: { reponse: "Imam Ghazali", valid: true },
+    reponse2: { reponse: "Imam Junayd", valid: false },
+    reponse3: { reponse: "Rumi", valid: false },
+  },
+  {
+    domanda:
+      "Qui accompagnaient le Shaykh durant son exil, écrit par le Shaykh dans un de ses Khassida?",
+    reponse1: { reponse: "Des anges", valid: false },
+    reponse2: { reponse: "Les Gens de Badr", valid: true },
+    reponse3: { reponse: "Des jinns", valid: false },
+  },
+  {
+    domanda: "Pourquoi le Shaykh a prié sur la mer?",
+    reponse1: { reponse: "Parce qu'il voulait s'échapper", valid: false },
+    reponse2: {
+      reponse: "Parce qu'il voulait accomplir un miracle",
+      valid: false,
+    },
+    reponse3: {
+      reponse:
+        "Parce que les colons refusaient qu'il prie sur leur bateau",
+      valid: true,
+    },
+  },
+  {
+    domanda: "Quel est le dernier Khassida écrit par le Shaykh?",
+    reponse1: { reponse: "Khaatimatoul Mounajati", valid: true },
+    reponse2: { reponse: "Jawartu", valid: false },
+    reponse3: { reponse: "Jazbu", valid: false },
+  },
+  {
+    domanda:
+      "Pendant combien d'années le Shaykh a-t-il été détenu par les colons?",
+    reponse1: { reponse: "33ans", valid: true },
+    reponse2: { reponse: "40ans", valid: false },
+    reponse3: { reponse: "27ans", valid: false },
+  },
+  {
+    domanda: "Quand est-ce que le Shaykh a créé le Mouridisme?",
+    reponse1: { reponse: 1915, valid: false },
+    reponse2: { reponse: 1882, valid: true },
+    reponse3: { reponse: 1907, valid: false },
+  },
+
+  {
+    domanda:
+      "En quelle date du calendrier musulman le Shaykh retourna à Touba après avoir rendu l'âme?",
+    reponse1: { reponse: "20 Muharram 1346", valid: true },
+    reponse2: { reponse: "20 Muharram 1246", valid: false },
+    reponse3: { reponse: "20 Muharram 1336", valid: false },
+  },
+  {
+    domanda:
+      "En quelle année le Shaykh fit son retour au Sénégal après son exil au Gabon?",
+    reponse1: { reponse: 1902, valid: true },
+    reponse2: { reponse: 1912, valid: false },
+    reponse3: { reponse: 1922, valid: false },
+  },
+  {
+    domanda:
+      "Comment s'appelle l'oeuvre plus importante que le Shaykh a écrit sur le Soufisme?",
+    reponse1: { reponse: "Mawahibou Nafih", valid: false },
+    reponse2: { reponse: "Nahju", valid: false },
+    reponse3: { reponse: "Masaalikul Jinaan", valid: true },
+  },
+  {
+    domanda:
+      "Quel est le Khassida écrit par le Shaykh en Mauritanie pour invoquer en faveur des Musulmans opprimés?",
+    reponse1: { reponse: "Wakaana Haqqan", valid: true },
+    reponse2: { reponse: "Touhfatou", valid: false },
+    reponse3: {
+      reponse: "Karamnaa",
+      valid: false,
+    },
+  },
+  {
+    domanda:
+      "Quelle est l'oeuvre écrite par le Shaykh traitant le bon comportement?",
+    reponse1: { reponse: "Jawharu Naafis", valid: false },
+    reponse2: { reponse: "Nahju", valid: true },
+    reponse3: {
+      reponse: "Tazawwudu Shubbaan",
+      valid: false,
+    },
+  },
+  {
+    domanda:
+      "Quelle était la principale ambition du Shaykh en acceptant les épreuves de l'exil?",
+    reponse1: { reponse: "Etre un Qutb", valid: false },
+    reponse2: {
+      reponse: "Etre très puissant après son retour",
+      valid: false,
+    },
+    reponse3: {
+      reponse: "Atteindre le rang des Gens de Badr",
+      valid: true,
+    },
+  },
+  {
+    domanda:
+      'Pour quelle raison le Shaykh était considéré par certains comme un "fou" à ses débuts?',
+    reponse1: {
+      reponse:
+        "Parce qu'il refusait les privilèges que lui offrait Lat Dior pour qu'il soit le Cadi de son royaume ",
+      valid: true,
+    },
+    reponse2: {
+      reponse: "Parce qu'il était trop pieux selon eux",
+      valid: false,
+    },
+    reponse3: {
+      reponse:
+        "Parce qu'il s'opposait à l'assimilation culturelle et cultuelle imposée par les colons",
+      valid: false,
+    },
+  },
+  {
+    domanda:
+      "Quel célèbre Khassida a écrit le Shaykh utilisant une métrique qu'il a créée lui-meme?",
+    reponse1: {
+      reponse: "Sindidi",
+      valid: false,
+    },
+    reponse2: {
+      reponse: "Radiitou",
+      valid: false,
+    },
+    reponse3: {
+      reponse: "Mawaahibou Nafih",
+      valid: true,
+    },
+  },
+  {
+    domanda:
+      "Quand est-ce que qu'au Shaykh fut révélé qu'il est le Serviteur du Prophète SAW?",
+    reponse1: {
+      reponse: "Quand il était à Touba",
+      valid: false,
+    },
+    reponse2: {
+      reponse: "Quand il était dans le bateau ralliant Conakry",
+      valid: true,
+    },
+    reponse3: {
+      reponse: "Quand il était à Mayomba",
+      valid: false,
+    },
+  },
+  {
+    domanda:
+      "Où le Shaykh a-t-il reçu premièrement son propre Wird de la part du Prophète SAW?",
+    reponse1: {
+      reponse: "En Mauritanie",
+      valid: true,
+    },
+    reponse2: {
+      reponse: "A' Thiéyène",
+      valid: false,
+    },
+    reponse3: {
+      reponse: "A' Diourbel",
+      valid: false,
+    },
+  },
+  {
+    domanda:
+      "Pourquoi le Shaykh a appelé tous les Musulmans à célébrer le Grand Magal?",
+    reponse1: {
+      reponse: "Parce qu'il voulait qu'ils se rappellent de son exil",
+      valid: false,
+    },
+    reponse2: {
+      reponse:
+        "Parce qu'il jugeait que, seul, il ne pouvait pas rendre grâce à Allah comme il le faut après les bienfaits qu'Il lui imparti",
+      valid: true,
+    },
+    reponse3: {
+      reponse:
+        "Parce qu'il voulait fêter sa éclatante victoire sur les colons",
+      valid: false,
+    },
+  },
+  {
+    domanda:
+      "Quel est le Khassida écrit par le Shaykh pour invoquer en faveur de Touba et de ses habitants?",
+    reponse1: {
+      reponse: "Mafatihoul Bichri",
+      valid: false,
+    },
+    reponse2: {
+      reponse: "Matlaboul Fawzayni",
+      valid: true,
+    },
+    reponse3: {
+      reponse: "Ikfini",
+      valid: false,
+    },
+  },
+  {
+    domanda: "A' quoi se refère le Shaykh en appelant sa Cité Touba?",
+    reponse1: {
+      reponse: "un nom d'Allah",
+      valid: false,
+    },
+    reponse2: {
+      reponse: "un nom d'un ange",
+      valid: false,
+    },
+    reponse3: {
+      reponse: "un nom d'un arbre au Paradis",
+      valid: true,
+    },
+  },
+];
+let incorrect=new Audio("incorrect0.mp3");
+let correct=new Audio("correct.mp3");
+let alert0=new Audio("alert.mp3");
+let clock=new Audio("clock.mp3");
+let totalPoints = ar.length;
+//console.log(totalPoints);
+
+let game = {
+  point: 0,
+  timer: 15,
+  nuovaDomanda: "",
+};
+
+btnCommencer.addEventListener("click", function () {
+  btnCommencer.classList.add("hide");
+  question.style.backgroundColor = "black";
+  nb.classList.add("hide");
+  timer.classList.remove("hide");
+  points.classList.remove("hide");
+  startGame();
+});
+
+function createDivReponses(el, classe, text, validé) {
+  let d = document.createElement(el);
+  d.classList.add(classe);
+  d.textContent = text;
+  reponses.appendChild(d);
+  function handleAnswer(event) {
+    clearInterval(intervalId); // Ferma il timer quando si risponde
+
+    const allReponses = reponses.children;
+    for (let i = 0; i < allReponses.length; i++) {
+      allReponses[i].style.pointerEvents = "none"; // Disabilita i clic su tutte le risposte
+    }
+    if (validé) {
+      event.currentTarget.setAttribute("id", "green");
+      correct.play();
+      game.point += 10;
+      points.style.display='inline';
+      points.innerText = "Points: " + game.point;
+      alert0.pause();
+      alert0.currentTime = 0;
+      clock.pause();
+      clock.currentTime=0;
+    } else {
+      event.currentTarget.setAttribute("id", "red");
+      incorrect.play();
+      points.style.display='inline';
+      points.innerText = "Points: " + game.point;
+      alert0.pause();
+      alert0.currentTime = 0;
+      clock.pause();
+      clock.currentTime=0;
+    }
+    // Attendi un secondo per mostrare il colore, poi passa alla domanda successiva
+    setTimeout(continuare, 1000);
+  }
+
+  d.addEventListener("click", handleAnswer);
+}
+
+function startGame() {
+  if (ar.length === 0) {
+    setTimeout(endGame, 1000);
+  } else {
+    game.nuovaDomanda = ar.shift();
+    question.innerHTML = game.nuovaDomanda.domanda;
+    reponses.innerHTML = "";
+
+    createDivReponses(
+      "div",
+      "divReponses",
+      game.nuovaDomanda.reponse1.reponse,
+      game.nuovaDomanda.reponse1.valid
+    );
+    createDivReponses(
+      "div",
+      "divReponses",
+      game.nuovaDomanda.reponse2.reponse,
+      game.nuovaDomanda.reponse2.valid
+    );
+    createDivReponses(
+      "div",
+      "divReponses",
+      game.nuovaDomanda.reponse3.reponse,
+      game.nuovaDomanda.reponse3.valid
+    );
+
+    game.timer = 15;
+    startTimer();
+  }
+}
+
+function continuare() {
+  if (ar.length === 0) {
+    setTimeout(endGame, 1000);
+  } else {
+    btnContinuer.classList.remove("hide");
+    btnContinuer.addEventListener("click", function handleContinue() {
+      btnContinuer.classList.add("hide");
+      btnContinuer.removeEventListener("click", handleContinue);
+      startGame();
+    });
+  }
+}
+
+function startTimer() {
+  if (game.timer > 5) {
+    timer.style.color = "white";
+    clock.play();
+    
+  }
+  
+  timer.innerText = "Timer: " + game.timer;
+  intervalId = setInterval(function () {
+    game.timer -= 1;
+    timer.innerText = "Timer: " + game.timer;
+    if (game.timer < 6) {
+      timer.style.color = "red";
+      clock.pause();
+      clock.currentTime=0;
+      alert0.play();
+  
+    }
+
+    if (game.timer < 0) {
+      clearInterval(intervalId);
+      alert0.pause();
+      alert0.currentTime = 0;
+      points.style.display='inline';
+      points.innerText = "Points: " + game.point;
+      startGame();
+    }
+  }, 1000);
+}
+
+function endGame() {
+  question.textContent = "Questions terminées!";
+  reponses.innerHTML = "";
+  let sp = document.createElement("span");
+  sp.textContent =
+    "Tu as obtenu " + game.point + "/" + totalPoints * 10 + " points";
+  question.appendChild(sp);
+  timer.setAttribute("class", "hide");
+  points.style.display='none';
+  btnContinuer.classList.add("hide");
+}
+    </script>
+  </body>
+</html>
